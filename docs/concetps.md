@@ -10,5 +10,7 @@ a CRUD API managing resources: memories, question/answer messages, summaries, et
 
 ## retrieval augmented generation. 
 
-search from the index (general or vertical) and chat history, and send the result as context to the LLM. 
+search across multiple sources (the web + vertical indexes) and chat history, and send the result as context to the LLM. 
+
+## multi-LLM support
 
