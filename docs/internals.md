@@ -1,34 +1,36 @@
 # Tech stack
 
-## web
+## frontend
 
 a web-based user interface
 
-## agent framework
+## backend
 
-langchaingo
+### agent framework
 
-## metasearch
+LangChainGO
 
-searxng
+### LLMs
 
-## vector search
+support mulitple LLM APIs;
 
-vearch, etc.
+Ollama for using open source models;
 
-## models
+### Web search APIs
 
-Ollama, making use of local open-source LLMs and embedding models
+### built-in vector/hybrid search
 
-## rerankers
+Vearch
+
+### rerankers
 
 open source + custom rerankers
 
-## long-term memory
+### long-term memory
 
-LTM
+LTM - a specailized subsystem for managing chat history: messages, memories, summaries, etc.
 
-## conversational query rewriting
+### conversational query rewriting
 
 CQR
 
@@ -38,4 +40,5 @@ docker and kubernetes
 
 ## storage
 
-cubefs
+CubeFS
+
