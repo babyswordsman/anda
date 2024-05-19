@@ -18,6 +18,8 @@ Ollama for using open source models;
 
 ### Web search APIs
 
+serper, searxng, et al.
+
 ### built-in vector/hybrid search
 
 Vearch
