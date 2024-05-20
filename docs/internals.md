@@ -3,6 +3,7 @@
 ## frontend
 
 a web-based user interface
+* Fyne
 
 ## backend
 
@@ -31,10 +32,11 @@ open source + custom rerankers
 ### long-term memory
 
 LTM - a specailized subsystem for managing chat history: messages, memories, summaries, etc.
+* Zep
 
 ### conversational query rewriting
 
-CQR
+CQR models
 
 ## deployment
 
