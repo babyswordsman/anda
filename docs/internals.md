@@ -44,3 +44,10 @@ docker and kubernetes
 
 CubeFS
 
+## models
+
+* query rewritting model
+* embedding model
+* rerankers
+* LLMs
+
