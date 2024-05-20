@@ -8,7 +8,7 @@ a web-based user interface
 
 ### agent framework
 
-LangChainGO
+* LangChainGo
 
 ### LLMs
 
@@ -22,7 +22,7 @@ serper, searxng, et al.
 
 ### built-in vector/hybrid search
 
-Vearch
+* Vearch
 
 ### rerankers
 
@@ -46,8 +46,9 @@ CubeFS
 
 ## models
 
-* query rewritting model
-* embedding model
+* query arbiter - search or not
+* query rewritter
+* embedders
 * rerankers
 * LLMs
 
