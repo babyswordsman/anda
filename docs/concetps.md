@@ -2,6 +2,17 @@
 
 The key elements of conversational search: question understanding, conversation flow, retrieval & reranking, answer generation and related question suggestions. 
 
+Particularly, the ai search agent - 
+
+* maintains the chat history for each user as long-term memory
+* judges to search or not
+* rewrites the conversational query
+* retrieves from Web search APIs and/or self-hosted internal indexes (Vearch by default)
+* reranks the retrieval result
+* generates the answer by calling LLMs
+* suggests related questions
+* can be planning and multi-step reasoning
+
 ## chat history
 
 build a specialized store with a simple CRUD API managing the resources: memories, question/answer messages, summaries, et al.
