@@ -17,11 +17,11 @@ support mulitple LLM APIs;
 
 Ollama for using open source models;
 
-### Web search APIs
+### public search APIs
 
 serper, searxng, et al.
 
-### built-in vector/hybrid search
+### private vector or hybrid search
 
 * Vearch
 
@@ -31,8 +31,7 @@ open source + custom rerankers
 
 ### long-term memory
 
-LTM - a specailized subsystem for managing chat history: messages, memories, summaries, etc.
-* Zep
+* CALM: conversational ai long-term memory, a purpose-built service for managing chat history of ai assistants: messages, memories, summaries, etc.
 
 ### conversational query rewriting
 
