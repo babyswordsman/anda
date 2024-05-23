@@ -25,6 +25,10 @@ serper, searxng, et al.
 
 * Vearch
 
+### connectors
+
+connect to multiple data sources
+
 ### rerankers
 
 open source + custom rerankers
