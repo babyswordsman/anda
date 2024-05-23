@@ -7,7 +7,7 @@ Particularly, the ai search agent -
 * maintains the chat history for each user as long-term memory
 * judges to search or not
 * rewrites the conversational query
-* retrieves from Web search APIs and/or self-hosted internal indexes (Vearch by default)
+* simultaneously retrieves from multiple data sources, e.g., Web search APIs and/or internal index providers
 * reranks the retrieval result
 * generates the answer by calling LLMs
 * suggests related questions
