@@ -1,7 +1,6 @@
 package main
 
-type Config struct{
+type Config struct {
 	ServerAddr string `yaml:"server_addr"`
-	LogLevel string `yaml:"log_level"`
-
+	LogLevel   string `yaml:"log_level"`
 }
