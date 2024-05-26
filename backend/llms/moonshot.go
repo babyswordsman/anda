@@ -78,12 +78,10 @@ func (o *MoonshotLLM) TokenCount(ctx context.Context, msg string) (int, error) {
 		return 0, err
 	}
 
-	// 检查 status 字段
 	if !result.Status {
 		return 0, fmt.Errorf("status is false")
 	}
 
-	// 返回 total_tokens 字段
 	return result.Data.TotalTokens, nil
 
 }
@@ -161,7 +159,6 @@ func (o *MoonshotLLM) send(ctx context.Context, uri string, body []byte) ([]byte
 		return nil, err
 	}
 
-	// 检查 HTTP 响应状态码
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected HTTP status: %s body: %s", resp.Status, string(respBody))
 	}
