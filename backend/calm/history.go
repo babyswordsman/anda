@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/anda-ai/anda/models"
+	"github.com/anda-ai/anda/entity"
 	logger "github.com/sirupsen/logrus"
 	"os"
 	"sync"
@@ -47,7 +47,7 @@ func maxFileByDir(dir string) (*os.File, error) {
 	return os.OpenFile(dir+"/"+maxName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 }
 
-func (h *MessageHistory) AddMessage(ctx context.Context, user string, message *models.Message) error {
+func (h *MessageHistory) AddMessage(ctx context.Context, user string, message *entity.Message) error {
 	uh, ok := h.userFile.Load(user)
 
 	if !ok {
@@ -91,7 +91,7 @@ func newUserHistory(dataDir, user string) (*userHistory, error) {
 	}, nil
 }
 
-func (h *userHistory) Write(msg *models.Message) error {
+func (h *userHistory) Write(msg *entity.Message) error {
 	h.locker.Lock()
 	defer h.locker.Unlock()
 	data, err := json.Marshal(msg)

@@ -1,6 +1,4 @@
 /*
-
 the model servers
-
 */
-package models
+package entity

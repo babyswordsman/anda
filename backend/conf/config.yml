@@ -1,2 +1,12 @@
-server_addr: 0.0.0.0:8081
-log_level: debug
+server_addr: "0.0.0.0:8081"
+log_level: "debug"
+llm:
+  moonshot:
+    api_key: "your_moonshot_api_key"
+    model: "your_model"
+    timeout_sec: 30
+    temperature: 0.3
+search:
+  serpers:
+    - api_key: "your_serper_api_key"
+      timeout_sec: 30

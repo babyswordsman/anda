@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/anda-ai/anda/conf"
-	"github.com/anda-ai/anda/models"
+	"github.com/anda-ai/anda/entity"
 	logger "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -38,7 +38,7 @@ func NewSerper(cfg *conf.SerperCfg) Searcher {
 	}
 }
 
-func (s *Serper) Search(ctx context.Context, query string, pageSize int) (*models.SearchResult, error) {
+func (s *Serper) Search(ctx context.Context, query string, pageSize int) (*entity.SearchResult, error) {
 	bodyParam := make(map[string]interface{})
 	bodyParam["q"] = query
 	bodyParam["location"] = "China"
@@ -85,7 +85,7 @@ func (s *Serper) Search(ctx context.Context, query string, pageSize int) (*model
 		return nil, err
 	}
 
-	result := &models.SearchResult{}
+	result := &entity.SearchResult{}
 	for _, item := range serperResult.RelatedSearches {
 		result.RelatedSearches = append(result.RelatedSearches, item.Query)
 
@@ -97,7 +97,7 @@ func (s *Serper) Search(ctx context.Context, query string, pageSize int) (*model
 		if err != nil {
 			logger.Warnf("parse date error: %s", err.Error())
 		}
-		result.Hits = append(result.Hits, &models.Hit{
+		result.Hits = append(result.Hits, &entity.Hit{
 			Title:   item.Title,
 			Link:    item.Link,
 			Snippet: item.Snippet,

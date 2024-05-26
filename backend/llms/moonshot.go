@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/anda-ai/anda/conf"
-	"github.com/anda-ai/anda/models"
+	"github.com/anda-ai/anda/entity"
 	logger "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"io"
@@ -86,7 +86,7 @@ func (o *MoonshotLLM) TokenCount(ctx context.Context, msg string) (int, error) {
 
 }
 
-func (o *MoonshotLLM) ChatCompletion(ctx context.Context, msgs []*models.Message) (string, error) {
+func (o *MoonshotLLM) ChatCompletion(ctx context.Context, msgs []*entity.Message) (string, error) {
 
 	req := MoonshotRequestBody{
 		Model:       o.model,
@@ -129,7 +129,7 @@ func (o *MoonshotLLM) ChatCompletion(ctx context.Context, msgs []*models.Message
 
 }
 
-func (o MoonshotLLM) ChatCompletionStream(ctx context.Context, request []*models.Message) (*Stream, error) {
+func (o MoonshotLLM) ChatCompletionStream(ctx context.Context, request []*entity.Message) (*Stream, error) {
 	//TODO implement me
 	panic("implement me")
 }

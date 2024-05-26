@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"github.com/anda-ai/anda/conf"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	logger "github.com/sirupsen/logrus"
@@ -13,15 +15,20 @@ func main() {
 	logger.SetReportCaller(true)
 
 	var configPath string
-	flag.StringVar(&configPath, "conf", "conf/config.yaml", "config path,example:conf/config.yaml")
+	flag.StringVar(&configPath, "conf", "conf/config.yml", "config path,example:conf/config.yml")
 	flag.Parse()
 
 	content, err := os.ReadFile(configPath)
 	if err != nil {
-		logger.Errorf("read file(%s) err:%s", configPath, err)
+		path, e := filepath.Abs(configPath)
+		if e != nil {
+			logger.Errorf("read file(%s) err:%s stat_err:%s", configPath, err, e)
+			return
+		}
+		logger.Errorf("read file(%s) err:%s", path, err)
 		return
 	}
-	config := &Config{}
+	config := &conf.Config{}
 	err = yaml.Unmarshal(content, config)
 	if err != nil {
 		logger.Errorf("parse yaml err:%s", err)
@@ -39,6 +46,10 @@ func main() {
 	//star http server
 	r := gin.Default()
 	router(r)
-	r.Run(config.ServerAddr)
+
+	if err := r.Run(config.ServerAddr); err != nil {
+		logger.Errorf("star server err:%s", err)
+		return
+	}q
 	logger.Infof("star server:%s", config.ServerAddr)
 }
