@@ -1,7 +1,7 @@
 package conf
 
 type SearchConfig struct {
-	Serpers []*SerperCfg `yaml:"serpers" json:"serpers"`
+	Serper *SerperCfg `yaml:"serper" json:"serper"`
 }
 
 type SerperCfg struct {

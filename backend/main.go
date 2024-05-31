@@ -45,11 +45,11 @@ func main() {
 
 	//star http server
 	r := gin.Default()
-	router(r)
+	router(config, r)
 
 	if err := r.Run(config.ServerAddr); err != nil {
 		logger.Errorf("star server err:%s", err)
 		return
-	}q
+	}
 	logger.Infof("star server:%s", config.ServerAddr)
 }
