@@ -39,12 +39,19 @@ func NewRouter(cfg *conf.Config) *Router {
 }
 
 func (r *Router) chat(c *gin.Context) {
+
+	logger.Infof("chat recive conn on %s", c.Request.Host)
+
 	conn, err := r.buffer.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		logger.Errorf("upgrade err:%s", err)
+		return
 	}
 
 	defer func(conn *websocket.Conn) {
+		if conn == nil {
+			return
+		}
 		err := conn.Close()
 		if err != nil {
 			logger.Warnf("close conn err:%s", err)
@@ -54,13 +61,21 @@ func (r *Router) chat(c *gin.Context) {
 	ctx := context.Background()
 	for {
 		_, p, err := conn.ReadMessage()
-		if err == nil {
+
+		if err != nil {
 			logger.Errorf("read msg err:%s", err)
 			break
 		}
 
-		var query *entity.ChatQueryRequest
+		bs, err := json.Marshal(&entity.ChatQueryRequest{
+			Query: "中国的国土面积有多少大",
+		})
 
+		logger.Infof("read message query:[%s]", string(bs))
+
+		logger.Infof("read message query:[%s]", string(p))
+
+		var query = &entity.ChatQueryRequest{}
 		if err := json.Unmarshal(p, query); err != nil {
 			logger.Errorf("unmarshal err:%s", err)
 			return
@@ -85,8 +100,9 @@ func (r *Router) chat(c *gin.Context) {
 			return
 		}
 
-		answer, err := r.chatAgent.Llm.ChatCompletion(ctx, makeMessages(ctx, resp, query))
+		stream, err := r.chatAgent.Llm.ChatCompletionStream(ctx, makeMessages(ctx, resp, query))
 		if err != nil {
+			logger.Errorf("read answer has err:%s", err)
 			if err := writeErr(conn, err); err != nil {
 				logger.Errorf("write err:%s", err)
 				return
@@ -94,7 +110,29 @@ func (r *Router) chat(c *gin.Context) {
 			return
 		}
 
-		if err := writeAnswer(conn, answer); err != nil {
+		for {
+			answer, err := stream.Next()
+
+			if answer == "" && err == nil {
+				break
+			}
+
+			if err != nil {
+				logger.Errorf("read answer has err:%s", err)
+				if err := writeErr(conn, err); err != nil {
+					logger.Errorf("write err:%s", err)
+					return
+				}
+				return
+			}
+
+			if err := writeAnswer(conn, answer); err != nil {
+				logger.Errorf("write err:%s", err)
+				return
+			}
+		}
+
+		if err := writeAnswer(conn, "<END_EOF>"); err != nil {
 			logger.Errorf("write err:%s", err)
 			return
 		}
@@ -143,13 +181,12 @@ func writeSearch(conn *websocket.Conn, resp *entity.SearchResult) error {
 }
 
 type Response struct {
-	Data   interface{} `json:"data"`
-	Msg    string      `json:"msg"`
-	Status int         `json:"status"`
+	Data   interface{} `json:"data"`   // if status is 0, it write error message
+	Msg    string      `json:"msg"`    // if status is 1, it's search result, if status is 2, it's answer
+	Status int         `json:"status"` // 0 err , 1 search , 2 answer
 }
 
 func writeErr(conn *websocket.Conn, e error) error {
-	logger.Errorf("write err:%s", e)
 	body, err := json.Marshal(&Response{
 		Msg:    e.Error(),
 		Status: 0,

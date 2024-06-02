@@ -1,6 +1,7 @@
 package llms
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -33,16 +35,17 @@ type MoonshotRequestBody struct {
 	Model       string            `json:"model"`
 	Messages    []MoonshotMessage `json:"messages"`
 	Temperature float32           `json:"temperature"`
+	Stream      bool              `json:"stream"`
 }
 
 func NewMoonshotLLM(cfg *conf.MoonshotCfg) LLM {
+
+	logger.Infof("new moonshot api key: xxxxxxxxxx with model: %s temperature: %f timeout: %d s", cfg.Model, cfg.Temperature, cfg.TimeoutSec)
 
 	key := os.Getenv("LLM_API_KEY")
 	if key == "" {
 		key = cfg.APIKey
 	}
-
-	logger.Infof("moonshot api key: %s with timeout: %d s", key, cfg.TimeoutSec)
 
 	return &MoonshotLLM{
 		model:       cfg.Model,
@@ -129,9 +132,95 @@ func (o *MoonshotLLM) ChatCompletion(ctx context.Context, msgs []*entity.Message
 
 }
 
-func (o MoonshotLLM) ChatCompletionStream(ctx context.Context, request []*entity.Message) (*Stream, error) {
-	//TODO implement me
-	panic("implement me")
+func (o MoonshotLLM) ChatCompletionStream(ctx context.Context, msgs []*entity.Message) (*Stream, error) {
+	req := MoonshotRequestBody{
+		Model:       o.model,
+		Messages:    make([]MoonshotMessage, 0),
+		Temperature: o.Temperature,
+		Stream:      true,
+	}
+
+	for _, msg := range msgs {
+		if msg.Content == "" {
+			continue
+		}
+
+		req.Messages = append(req.Messages, MoonshotMessage{
+			Role:    msg.Role,
+			Content: msg.Content,
+		})
+	}
+
+	if len(req.Messages) == 0 {
+		return nil, fmt.Errorf("no message")
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	stream := NewStream()
+
+	go func() {
+		if err := o.streamSend(ctx, stream, "/chat/completions", body); err != nil {
+			stream.error <- err
+		}
+	}()
+
+	return stream, nil
+}
+
+func (o *MoonshotLLM) streamSend(ctx context.Context, stream *Stream, uri string, body []byte) error {
+	req, err := http.NewRequestWithContext(ctx, "POST", baseurl+uri, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+o.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := o.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logger.Error(err)
+		}
+	}(resp.Body)
+
+	br := bufio.NewReader(resp.Body)
+	for {
+		temp, _, e := br.ReadLine()
+		if e != nil {
+			if e == io.EOF {
+				return nil
+			} else {
+				return err
+			}
+		}
+
+		if len(temp) == 0 {
+			continue
+		}
+
+		line := string(temp)
+
+		if !strings.HasPrefix(line, "data:") {
+			return fmt.Errorf("data: err line %s", line)
+		}
+
+		result := gjson.GetBytes(temp[5:], "choices.0.delta.content").String()
+
+		if result == "" {
+			continue
+		}
+
+		stream.inner <- result
+
+	}
 }
 
 func (o *MoonshotLLM) send(ctx context.Context, uri string, body []byte) ([]byte, error) {

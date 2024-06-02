@@ -2,6 +2,7 @@ package llms
 
 import (
 	"context"
+	"fmt"
 	"github.com/anda-ai/anda/conf"
 	"github.com/anda-ai/anda/entity"
 	"os"
@@ -75,4 +76,45 @@ func TestMoonshotLLM_ChatCompletion(t *testing.T) {
 
 	}
 	println(got)
+}
+
+func TestMoonshotLLM_ChatCompletionStream(t *testing.T) {
+
+	llm := NewMoonshotLLM(&conf.MoonshotCfg{
+		APIKey:      "sk-iN8XO4AwbozpTDyucAewJsO2kjfF49kQkrqkSLDBUl0ubzm3",
+		TimeoutSec:  100,
+		Model:       "moonshot-v1-8k",
+		Temperature: 0.3,
+	})
+
+	msgs := []*entity.Message{
+		{
+			Role:    "system",
+			Content: "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。",
+		},
+		{
+			Role:    "user",
+			Content: "給我寫一個200字的作文描述中國的美麗景色",
+		},
+	}
+
+	ctx := context.Background()
+	stream, err := llm.ChatCompletionStream(ctx, msgs)
+	if err != nil {
+		t.Fatal("ChatCompletion() error ", err)
+
+	}
+
+	for {
+		v, e := stream.next()
+		if v == "" && e == nil {
+			fmt.Println("============================1")
+			break
+		}
+		if e != nil {
+			t.Fatal(e)
+		}
+		println("v: ", v)
+	}
+
 }

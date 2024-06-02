@@ -23,6 +23,8 @@ type Serper struct {
 
 func NewSerper(cfg *conf.SerperCfg) Searcher {
 
+	logger.Infof("new serper api key: xxxxxxxxxx with timeout: %d s", cfg.TimeoutSec)
+
 	key := os.Getenv("SERPER_API_KEY")
 	if key == "" {
 		key = cfg.APIKey
@@ -95,7 +97,7 @@ func (s *Serper) Search(ctx context.Context, query string, pageSize int) (*entit
 		const layout = "2006年1月2日"
 		parse, err := time.Parse(layout, item.Date)
 		if err != nil {
-			logger.Warnf("parse date error: %s", err.Error())
+			logger.Warnf("value:%s parse date error: %s", item.Date, err.Error())
 		}
 		result.Hits = append(result.Hits, &entity.Hit{
 			Title:   item.Title,
