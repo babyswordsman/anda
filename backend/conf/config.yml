@@ -1,2 +1,12 @@
-server_addr: 0.0.0.0:8081
-log_level: debug
+server_addr: "0.0.0.0:8888"
+log_level: "debug"
+llm:
+  moonshot:
+    api_key: "sk-iN8XO4AwbozpTDyucAewJsO2kjfF49kQkrqkSLDBUl0ubzm3"
+    model: "moonshot-v1-8k"
+    timeout_sec: 30
+    temperature: 0.3
+search:
+  serper:
+    api_key: "fedf600ef33760e9c8bafb6cad43d5d77251145f"
+    timeout_sec: 30
